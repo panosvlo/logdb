@@ -12,7 +12,10 @@ public class LogDetail {
     @Column(name = "log_id")
     private Long logId;
 
+    @Column(name = "key")
     private String key;
+
+    @Column(name = "value")
     private String value;
 
     // Getters and Setters

@@ -26,6 +26,7 @@ CREATE TABLE logs (
 
 -- Log Details Table
 CREATE TABLE log_details (
+    id SERIAL PRIMARY KEY,
     log_id INT,
     key VARCHAR(255),
     value TEXT,
