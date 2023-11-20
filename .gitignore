@@ -34,3 +34,4 @@ build/
 /access_log_full
 /access_log_full.short
 /HDFS_FS_Namesystem.log.short
+/HDFS_DataXceiver.log.short

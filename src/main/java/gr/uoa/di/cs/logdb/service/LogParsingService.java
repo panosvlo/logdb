@@ -50,6 +50,7 @@ public class LogParsingService {
     public void init() {
         loadAccessLogs();
         loadHDFSNamesystemLogs();
+        loadHDFSDataXceiverLogs();
     }
 
     private void loadAccessLogs() {
@@ -159,6 +160,48 @@ public class LogParsingService {
                         saveLogDetail(log.getId(), "block_id", blockId);
                     }
                     // Add additional details as needed
+                }
+            }
+        } catch (DateTimeParseException e) {
+            System.err.println("Error parsing the date: " + e.getParsedString());
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadHDFSDataXceiverLogs() {
+        final String hdfsDataXceiverLogPath = "HDFS_DataXceiver.log.short"; // Adjust the path accordingly
+        final Pattern hdfsDataXceiverLogPattern = Pattern.compile(
+                "(\\d{6} \\d{6}) (\\d+) INFO dfs\\.DataNode\\$DataXceiver: (\\S+) block blk_(-?\\d+) src: (/\\d+.\\d+.\\d+.\\d+:\\d+) dest: (/\\d+.\\d+.\\d+.\\d+:\\d+)"
+        );
+        final DateTimeFormatter hdfsDateFormatter = DateTimeFormatter.ofPattern("yyMMdd HHmmss");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(hdfsDataXceiverLogPath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                Matcher matcher = hdfsDataXceiverLogPattern.matcher(line);
+                if (matcher.find()) {
+                    // Extract data
+                    LocalDateTime dateTime = LocalDateTime.parse(matcher.group(1), hdfsDateFormatter);
+                    Date timestamp = Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+                    String action = matcher.group(3);
+                    String blockId = matcher.group(4);
+                    String src = matcher.group(5);
+                    String dest = matcher.group(6);
+
+                    // Save log entry
+                    Log log = new Log();
+                    log.setTimestamp(timestamp);
+                    log.setSourceIp(src.substring(1, src.indexOf(':'))); // Remove leading slash and port
+                    log.setDestinationIp(dest.substring(1, dest.indexOf(':'))); // Remove leading slash and port
+                    log = logRepository.save(log);
+
+                    // Save log details
+                    saveLogDetail(log.getId(), "action", action);
+                    saveLogDetail(log.getId(), "block_id", blockId);
+                    saveLogDetail(log.getId(), "src_port", src.substring(src.indexOf(':') + 1));
+                    saveLogDetail(log.getId(), "dest_port", dest.substring(dest.indexOf(':') + 1));
                 }
             }
         } catch (DateTimeParseException e) {
