@@ -2,6 +2,7 @@ package gr.uoa.di.cs.logdb.service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -48,11 +49,11 @@ public class LogParsingService {
     @PostConstruct
     public void init() {
         loadAccessLogs();
-        // Add methods for other log types
+        loadHDFSNamesystemLogs();
     }
 
     private void loadAccessLogs() {
-        final String accessLogPath = "access_log_full"; // Make sure this path is correct
+        final String accessLogPath = "access_log_full.short";
         final Pattern accessLogPattern = Pattern.compile("^(\\S+) \\S+ \\S+ \\[(.+?)\\] \"(\\S+) (\\S+)? (\\S+)\" (\\d{3}) (\\d+|-) \"(.*?)\" \"(.*?)\"");
         try (BufferedReader br = new BufferedReader(new FileReader(accessLogPath))) {
             String line;
@@ -115,5 +116,56 @@ public class LogParsingService {
         System.out.println("Current working directory: " + currentWorkingDirectory);
     }
 
-    // Additional methods to parse and load other log types...
+    private void loadHDFSNamesystemLogs() {
+        final String hdfsNamesystemLogPath = "HDFS_FS_Namesystem.log.short"; // Adjust the path accordingly
+        final Pattern hdfsNamesystemLogPattern = Pattern.compile(
+                "(\\d{6} \\d{6}) (\\d+) (\\S+) (dfs\\.FSNamesystem): (BLOCK\\* .+?): (.+)"
+        );
+        final DateTimeFormatter hdfsDateFormatter = DateTimeFormatter.ofPattern("yyMMdd HHmmss");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(hdfsNamesystemLogPath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                Matcher matcher = hdfsNamesystemLogPattern.matcher(line);
+                if (matcher.find()) {
+                    // Extract data
+                    LocalDateTime dateTime = LocalDateTime.parse(matcher.group(1), hdfsDateFormatter);
+                    Date timestamp = Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+                    String eventType = matcher.group(5);
+                    String details = matcher.group(6);
+
+                    // Further extract the block ID from the details string
+                    Pattern detailPattern = Pattern.compile("/([^ ]+).*blk_(-?\\d+)");
+                    Matcher detailMatcher = detailPattern.matcher(details);
+                    String path = null;
+                    String blockId = null;
+                    if (detailMatcher.find()) {
+                        path = detailMatcher.group(1); // Extracted path
+                        blockId = detailMatcher.group(2); // Extracted block ID
+                    }
+
+                    // Save log entry
+                    Log log = new Log();
+                    log.setTimestamp(timestamp);
+                    // Additional log fields can be set here if needed
+                    log = logRepository.save(log);
+
+                    // Save log details
+                    saveLogDetail(log.getId(), "event_type", eventType);
+                    if (path != null) {
+                        saveLogDetail(log.getId(), "path", path);
+                    }
+                    if (blockId != null) {
+                        saveLogDetail(log.getId(), "block_id", blockId);
+                    }
+                    // Add additional details as needed
+                }
+            }
+        } catch (DateTimeParseException e) {
+            System.err.println("Error parsing the date: " + e.getParsedString());
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
