@@ -22,7 +22,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/users/register","/swagger-ui/**","/v3/api-docs/**").permitAll() // Allow registration without authentication
+                .antMatchers("/api/users/register","/swagger-ui/**","/v3/api-docs/**","/api/**").permitAll() // Allow registration without authentication
                 .anyRequest().authenticated() // All other requests need authentication
                 .and()
                 .httpBasic(); // Use HTTP Basic Authentication
