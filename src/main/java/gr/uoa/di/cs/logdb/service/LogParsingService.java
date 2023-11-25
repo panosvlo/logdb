@@ -56,6 +56,7 @@ public class LogParsingService {
     private void loadAccessLogs() {
         final String accessLogPath = "access_log_full.short";
         final Pattern accessLogPattern = Pattern.compile("^(\\S+) \\S+ \\S+ \\[(.+?)\\] \"(\\S+) (\\S+)? (\\S+)\" (\\d{3}) (\\d+|-) \"(.*?)\" \"(.*?)\"");
+        LogType accessLogType = logTypeRepository.findByTypeName("access_log");
         try (BufferedReader br = new BufferedReader(new FileReader(accessLogPath))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -77,6 +78,7 @@ public class LogParsingService {
 
                     // Save log entry
                     Log log = new Log();
+                    log.setLogTypeId(accessLogType.getId());
                     log.setSourceIp(ip);
                     log.setTimestamp(timestamp);
                     log.setDestinationIp(null); // No destination IP in access logs
@@ -123,6 +125,7 @@ public class LogParsingService {
                 "(\\d{6} \\d{6}) (\\d+) (\\S+) (dfs\\.FSNamesystem): (BLOCK\\* .+?): (.+)"
         );
         final DateTimeFormatter hdfsDateFormatter = DateTimeFormatter.ofPattern("yyMMdd HHmmss");
+        LogType hdfsNamesystemLogType = logTypeRepository.findByTypeName("hdfs_fs_namesystem_log");
 
         try (BufferedReader br = new BufferedReader(new FileReader(hdfsNamesystemLogPath))) {
             String line;
@@ -147,6 +150,7 @@ public class LogParsingService {
 
                     // Save log entry
                     Log log = new Log();
+                    log.setLogTypeId(hdfsNamesystemLogType.getId());
                     log.setTimestamp(timestamp);
                     // Additional log fields can be set here if needed
                     log = logRepository.save(log);
@@ -176,6 +180,7 @@ public class LogParsingService {
                 "(\\d{6} \\d{6}) (\\d+) INFO dfs\\.DataNode\\$DataXceiver: (\\S+) block blk_(-?\\d+) src: (/\\d+.\\d+.\\d+.\\d+:\\d+) dest: (/\\d+.\\d+.\\d+.\\d+:\\d+)"
         );
         final DateTimeFormatter hdfsDateFormatter = DateTimeFormatter.ofPattern("yyMMdd HHmmss");
+        LogType hdfsDataXceiverLogType = logTypeRepository.findByTypeName("hdfs_dataxceiver_log");
 
         try (BufferedReader br = new BufferedReader(new FileReader(hdfsDataXceiverLogPath))) {
             String line;
@@ -192,6 +197,7 @@ public class LogParsingService {
 
                     // Save log entry
                     Log log = new Log();
+                    log.setLogTypeId(hdfsDataXceiverLogType.getId()); // Set log type id
                     log.setTimestamp(timestamp);
                     log.setSourceIp(src.substring(1, src.indexOf(':'))); // Remove leading slash and port
                     log.setDestinationIp(dest.substring(1, dest.indexOf(':'))); // Remove leading slash and port

@@ -17,7 +17,7 @@ CREATE TABLE log_types (
 -- Logs Table
 CREATE TABLE logs (
     id SERIAL PRIMARY KEY,
-    log_type_id INT,
+    log_type_id BIGINT,
     timestamp TIMESTAMP,
     source_ip VARCHAR(15),
     destination_ip VARCHAR(15),
@@ -32,3 +32,8 @@ CREATE TABLE log_details (
     value TEXT,
     FOREIGN KEY (log_id) REFERENCES logs (id)
 );
+
+INSERT INTO log_types (type_name) VALUES ('access_log');
+INSERT INTO log_types (type_name) VALUES ('hdfs_dataxceiver_log');
+INSERT INTO log_types (type_name) VALUES ('hdfs_fs_namesystem_log');
+

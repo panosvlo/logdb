@@ -11,7 +11,7 @@ public class Log {
     private Long id;
 
     @Column(name = "log_type_id")
-    private Integer logTypeId;
+    private Long logTypeId;
 
     @Column(name = "timestamp")
     @Temporal(TemporalType.TIMESTAMP)
@@ -32,11 +32,11 @@ public class Log {
         this.id = id;
     }
 
-    public Integer getLogTypeId() {
+    public Long getLogTypeId() {
         return logTypeId;
     }
 
-    public void setLogTypeId(Integer logTypeId) {
+    public void setLogTypeId(Long logTypeId) {
         this.logTypeId = logTypeId;
     }
 
