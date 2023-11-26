@@ -51,4 +51,13 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             "LIMIT 1 OFFSET 1",
             nativeQuery = true)
     List<Object[]> findSecondMostCommonResourceRaw();
+
+    @Query(value = "SELECT l.id, l.log_type_id, l.timestamp, l.source_ip, l.destination_ip, STRING_AGG(ld.key || ': ' || ld.value, '; ') " +
+            "FROM logs l JOIN log_details ld ON l.id = ld.log_id " +
+            "JOIN log_types lt ON l.log_type_id = lt.id " +
+            "WHERE lt.type_name = 'access_log' " +
+            "AND EXISTS (SELECT 1 FROM log_details ld2 WHERE ld2.log_id = l.id AND ld2.key = 'size' AND CAST(ld2.value AS INTEGER) < :size) " +
+            "GROUP BY l.id, l.log_type_id, l.timestamp, l.source_ip, l.destination_ip",
+            nativeQuery = true)
+    List<Object[]> findAccessLogsWithSizeLessThanRaw(@Param("size") int size);
 }

@@ -83,4 +83,21 @@ public class LogController {
 
         return ResponseEntity.ok(dto);
     }
+
+    @GetMapping("/accessLogsSize")
+    public ResponseEntity<List<AccessLogDTO>> getAccessLogsWithSizeLessThan(@RequestParam int size) {
+        List<Object[]> rawLogs = logRepository.findAccessLogsWithSizeLessThanRaw(size);
+        List<AccessLogDTO> logs = rawLogs.stream().map(obj -> {
+            Long id = ((Number) obj[0]).longValue(); // Cast to Number and then get long value
+            Long logTypeId = ((Number) obj[1]).longValue(); // Cast to Number and then get long value
+            Date timestamp = (Date) obj[2];
+            String sourceIp = (String) obj[3];
+            String destinationIp = (String) obj[4];
+            String logDetails = (String) obj[5];
+            return new AccessLogDTO(id, logTypeId, timestamp, sourceIp, destinationIp, logDetails);
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(logs);
+    }
+
 }
