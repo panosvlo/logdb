@@ -99,5 +99,10 @@ public class LogController {
 
         return ResponseEntity.ok(logs);
     }
+    @GetMapping("/accessLogs/firefox")
+    public ResponseEntity<List<Object[]>> getAccessLogsWithFirefox() {
+        List<Object[]> logs = logRepository.findAccessLogsByFirefoxRaw();
+        return ResponseEntity.ok(logs);
+    }
 
 }
