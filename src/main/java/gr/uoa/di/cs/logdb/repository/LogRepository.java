@@ -1,9 +1,6 @@
 package gr.uoa.di.cs.logdb.repository;
 
-import gr.uoa.di.cs.logdb.dto.LogCountDTO;
-import gr.uoa.di.cs.logdb.dto.LogCountPerDayDTO;
-import gr.uoa.di.cs.logdb.dto.MostCommonLogDTO;
-import gr.uoa.di.cs.logdb.dto.TopBlockActionsDTO;
+import gr.uoa.di.cs.logdb.dto.*;
 import gr.uoa.di.cs.logdb.model.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,4 +42,13 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             "ORDER BY COUNT(l) DESC, DATE(l.timestamp)",
             nativeQuery = true)
     Page<Object[]> findTopBlockActionsBetweenDates(Date startDate, Date endDate, Pageable pageable);
+
+    @Query(value = "SELECT ld.value AS resourceName, COUNT(ld.value) AS resourceCount " +
+            "FROM log_details ld " +
+            "WHERE ld.key = 'resource' " +
+            "GROUP BY ld.value " +
+            "ORDER BY COUNT(ld.value) DESC " +
+            "LIMIT 1 OFFSET 1",
+            nativeQuery = true)
+    List<Object[]> findSecondMostCommonResourceRaw();
 }

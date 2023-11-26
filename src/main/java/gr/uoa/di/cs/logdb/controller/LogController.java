@@ -1,9 +1,6 @@
 package gr.uoa.di.cs.logdb.controller;
 
-import gr.uoa.di.cs.logdb.dto.LogCountDTO;
-import gr.uoa.di.cs.logdb.dto.LogCountPerDayDTO;
-import gr.uoa.di.cs.logdb.dto.MostCommonLogDTO;
-import gr.uoa.di.cs.logdb.dto.TopBlockActionsDTO;
+import gr.uoa.di.cs.logdb.dto.*;
 import gr.uoa.di.cs.logdb.repository.LogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -69,5 +66,21 @@ public class LogController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/secondMostCommonResource")
+    public ResponseEntity<SecondMostCommonResourceDTO> getSecondMostCommonResource() {
+        List<Object[]> rawResult = logRepository.findSecondMostCommonResourceRaw();
+        if (rawResult == null || rawResult.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Object[] result = rawResult.get(0);
+        SecondMostCommonResourceDTO dto = new SecondMostCommonResourceDTO(
+                (String) result[0],
+                ((Number) result[1]).longValue()
+        );
+
+        return ResponseEntity.ok(dto);
     }
 }
