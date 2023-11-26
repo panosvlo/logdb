@@ -2,6 +2,7 @@ package gr.uoa.di.cs.logdb.controller;
 
 import gr.uoa.di.cs.logdb.dto.LogCountDTO;
 import gr.uoa.di.cs.logdb.dto.LogCountPerDayDTO;
+import gr.uoa.di.cs.logdb.dto.MostCommonLogDTO;
 import gr.uoa.di.cs.logdb.repository.LogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -42,5 +43,12 @@ public class LogController {
         }
 
         return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/mostCommonLog")
+    public ResponseEntity<List<MostCommonLogDTO>> getMostCommonLogByDate(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date specificDate) {
+        List<MostCommonLogDTO> result = logRepository.findMostCommonLogByDate(specificDate);
+        return ResponseEntity.ok(result);
     }
 }

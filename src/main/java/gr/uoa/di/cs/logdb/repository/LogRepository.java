@@ -2,6 +2,7 @@ package gr.uoa.di.cs.logdb.repository;
 
 import gr.uoa.di.cs.logdb.dto.LogCountDTO;
 import gr.uoa.di.cs.logdb.dto.LogCountPerDayDTO;
+import gr.uoa.di.cs.logdb.dto.MostCommonLogDTO;
 import gr.uoa.di.cs.logdb.model.Log;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
@@ -27,5 +28,10 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     List<Object[]> findTotalLogsPerDayForActionType(
             @Param("action") String action,
             @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate);
+            @Param("endDate") Date endDate);@Query("SELECT new gr.uoa.di.cs.logdb.dto.MostCommonLogDTO(l.sourceIp, lt.typeName, COUNT(l)) " +
+            "FROM Log l JOIN LogType lt ON l.logTypeId = lt.id " +
+            "WHERE DATE(l.timestamp) = :specificDate " +
+            "GROUP BY l.sourceIp, lt.typeName " +
+            "ORDER BY l.sourceIp, COUNT(l) DESC")
+    List<MostCommonLogDTO> findMostCommonLogByDate(Date specificDate);
 }
