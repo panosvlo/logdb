@@ -3,7 +3,10 @@ package gr.uoa.di.cs.logdb.repository;
 import gr.uoa.di.cs.logdb.dto.LogCountDTO;
 import gr.uoa.di.cs.logdb.dto.LogCountPerDayDTO;
 import gr.uoa.di.cs.logdb.dto.MostCommonLogDTO;
+import gr.uoa.di.cs.logdb.dto.TopBlockActionsDTO;
 import gr.uoa.di.cs.logdb.model.Log;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -34,4 +37,12 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             "GROUP BY l.sourceIp, lt.typeName " +
             "ORDER BY l.sourceIp, COUNT(l) DESC")
     List<MostCommonLogDTO> findMostCommonLogByDate(Date specificDate);
+
+    @Query(value = "SELECT ld.value, DATE(l.timestamp) as logDate, COUNT(l) as totalActions " +
+            "FROM logs l JOIN log_details ld ON l.id = ld.log_id " +
+            "WHERE ld.key = 'block_id' AND l.timestamp BETWEEN :startDate AND :endDate " +
+            "GROUP BY ld.value, DATE(l.timestamp) " +
+            "ORDER BY COUNT(l) DESC, DATE(l.timestamp)",
+            nativeQuery = true)
+    Page<Object[]> findTopBlockActionsBetweenDates(Date startDate, Date endDate, Pageable pageable);
 }
