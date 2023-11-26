@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -105,4 +106,19 @@ public class LogController {
         return ResponseEntity.ok(logs);
     }
 
+    @GetMapping("/methodUsage")
+    public ResponseEntity<List<MethodUsageDTO>> getMethodUsage(
+            @RequestParam String httpMethod,
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date start = sdf.parse(startDate);
+            Date end = sdf.parse(endDate);
+            List<MethodUsageDTO> results = logRepository.findMethodUsage(httpMethod, start, end);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

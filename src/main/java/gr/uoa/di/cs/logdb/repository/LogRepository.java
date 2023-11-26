@@ -67,4 +67,16 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             "GROUP BY l.id, l.log_type_id, l.timestamp, l.source_ip, l.destination_ip",
             nativeQuery = true)
     List<Object[]> findAccessLogsByFirefoxRaw();
+    @Query("SELECT new gr.uoa.di.cs.logdb.dto.MethodUsageDTO(l.sourceIp, COUNT(*)) " +
+            "FROM Log l JOIN LogDetail ld ON l.id = ld.logId " +
+            "JOIN LogType lt ON l.logTypeId = lt.id " +
+            "WHERE lt.typeName = 'access_log' AND ld.key = 'method' " +
+            "AND ld.value = :httpMethod " +
+            "AND l.timestamp BETWEEN :startDate AND :endDate " +
+            "GROUP BY l.sourceIp " +
+            "ORDER BY COUNT(*) DESC")
+    List<MethodUsageDTO> findMethodUsage(
+            @Param("httpMethod") String httpMethod,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate);
 }
