@@ -79,4 +79,30 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             @Param("httpMethod") String httpMethod,
             @Param("startDate") Date startDate,
             @Param("endDate") Date endDate);
+
+
+
+    @Query(value = "SELECT l1.source_ip, COUNT(DISTINCT l1.id) as request_count " +
+            "FROM logs l1 " +
+            "JOIN log_details ld1 ON l1.id = ld1.log_id " +
+            "JOIN log_types lt1 ON l1.log_type_id = lt1.id " +
+            "WHERE lt1.type_name = 'access_log' " +
+            "AND ld1.key = 'method' " +
+            "AND ld1.value = :method1 " +
+            "AND l1.timestamp BETWEEN :startDate AND :endDate " +
+            "AND EXISTS ( " +
+            "    SELECT 1 FROM logs l2 " +
+            "    JOIN log_details ld2 ON l2.id = ld2.log_id " +
+            "    WHERE l1.source_ip = l2.source_ip " +
+            "    AND ld2.key = 'method' " +
+            "    AND ld2.value = :method2 " +
+            "    AND l2.timestamp BETWEEN :startDate AND :endDate " +
+            ") " +
+            "GROUP BY l1.source_ip " +
+            "ORDER BY request_count DESC", nativeQuery = true)
+    List<Object[]> findIPsWithTwoMethods(
+            @Param("method1") String method1,
+            @Param("method2") String method2,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate);
 }

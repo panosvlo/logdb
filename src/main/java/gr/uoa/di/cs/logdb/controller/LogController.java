@@ -121,4 +121,19 @@ public class LogController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/ipsWithTwoMethods")
+    public ResponseEntity<List<IpRequestCountDTO>> getIPsWithTwoMethods(
+            @RequestParam String method1,
+            @RequestParam String method2,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+
+        List<Object[]> results = logRepository.findIPsWithTwoMethods(method1, method2, startDate, endDate);
+        List<IpRequestCountDTO> ipRequestCounts = results.stream()
+                .map(result -> new IpRequestCountDTO((String) result[0], ((Number) result[1]).intValue()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(ipRequestCounts);
+    }
 }
