@@ -136,4 +136,18 @@ public class LogController {
 
         return ResponseEntity.ok(ipRequestCounts);
     }
+
+    @GetMapping("/distinctMethods")
+    public ResponseEntity<List<IpMethodCountDTO>> getIPsWithDistinctMethods(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam int minMethods) {
+
+        List<Object[]> queryResults = logRepository.findIPsWithDistinctMethods(startDate, endDate, minMethods);
+        List<IpMethodCountDTO> results = queryResults.stream()
+                .map(obj -> new IpMethodCountDTO((String) obj[0], ((Number) obj[1]).intValue()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(results);
+    }
 }

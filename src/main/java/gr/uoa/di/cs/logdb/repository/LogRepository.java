@@ -105,4 +105,18 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             @Param("method2") String method2,
             @Param("startDate") Date startDate,
             @Param("endDate") Date endDate);
+
+    @Query(value = "SELECT l.source_ip, COUNT(DISTINCT ld.value) as distinct_methods_count " +
+            "FROM logs l JOIN log_details ld ON l.id = ld.log_id " +
+            "JOIN log_types lt ON l.log_type_id = lt.id " +
+            "WHERE lt.type_name = 'access_log' " +
+            "AND ld.key = 'method' " +
+            "AND l.timestamp BETWEEN :startDate AND :endDate " +
+            "GROUP BY l.source_ip " +
+            "HAVING COUNT(DISTINCT ld.value) >= :minMethods " +
+            "ORDER BY distinct_methods_count DESC", nativeQuery = true)
+    List<Object[]> findIPsWithDistinctMethods(
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("minMethods") int minMethods);
 }
