@@ -21,12 +21,12 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     @Query(value = "SELECT CAST(l.timestamp AS date) as logDate, COUNT(*) as totalLogs " +
             "FROM logs l " +
             "JOIN log_details ld ON l.id = ld.log_id " +
-            "WHERE ld.key = 'action' AND ld.value = :action " +
+            "WHERE ld.key = 'method' AND ld.value = :method " +
             "AND l.timestamp BETWEEN :startDate AND :endDate " +
             "GROUP BY CAST(l.timestamp AS date) " +
             "ORDER BY CAST(l.timestamp AS date)", nativeQuery = true)
     List<Object[]> findTotalLogsPerDayForActionType(
-            @Param("action") String action,
+            @Param("method") String method,
             @Param("startDate") Date startDate,
             @Param("endDate") Date endDate);@Query("SELECT new gr.uoa.di.cs.logdb.dto.MostCommonLogDTO(l.sourceIp, lt.typeName, COUNT(l)) " +
             "FROM Log l JOIN LogType lt ON l.logTypeId = lt.id " +

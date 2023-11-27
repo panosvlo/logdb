@@ -120,9 +120,10 @@ public class LogParsingService {
     }
 
     private void loadHDFSNamesystemLogs() {
-        final String hdfsNamesystemLogPath = "HDFS_FS_Namesystem.log.short"; // Adjust the path accordingly
+        final String hdfsNamesystemLogPath = "HDFS_FS_Namesystem.log.short";
+        // Adjust the pattern to capture IP addresses and other details
         final Pattern hdfsNamesystemLogPattern = Pattern.compile(
-                "(\\d{6} \\d{6}) (\\d+) (\\S+) (dfs\\.FSNamesystem): (BLOCK\\* .+?): (.+)"
+                "(\\d{6} \\d{6}) (\\d+) (\\S+) (dfs\\.FSNamesystem): (BLOCK\\*) (\\S+): (.+)"
         );
         final DateTimeFormatter hdfsDateFormatter = DateTimeFormatter.ofPattern("yyMMdd HHmmss");
         LogType hdfsNamesystemLogType = logTypeRepository.findByTypeName("hdfs_fs_namesystem_log");
@@ -132,38 +133,49 @@ public class LogParsingService {
             while ((line = br.readLine()) != null) {
                 Matcher matcher = hdfsNamesystemLogPattern.matcher(line);
                 if (matcher.find()) {
-                    // Extract data
                     LocalDateTime dateTime = LocalDateTime.parse(matcher.group(1), hdfsDateFormatter);
                     Date timestamp = Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
-                    String eventType = matcher.group(5);
-                    String details = matcher.group(6);
+                    String threadId = matcher.group(2);
+                    String logLevel = matcher.group(3);
+                    String component = matcher.group(4);
+                    String operation = matcher.group(6);
+                    String details = matcher.group(7);
 
-                    // Further extract the block ID from the details string
-                    Pattern detailPattern = Pattern.compile("/([^ ]+).*blk_(-?\\d+)");
-                    Matcher detailMatcher = detailPattern.matcher(details);
-                    String path = null;
-                    String blockId = null;
-                    if (detailMatcher.find()) {
-                        path = detailMatcher.group(1); // Extracted path
-                        blockId = detailMatcher.group(2); // Extracted block ID
+                    // Assuming the IP and port are always present after the operation text
+                    Pattern ipPattern = Pattern.compile("(\\d+.\\d+.\\d+.\\d+:\\d+)");
+                    Matcher ipMatcher = ipPattern.matcher(details);
+                    String ip = null;
+                    if (ipMatcher.find()) {
+                        ip = ipMatcher.group(1).split(":")[0]; // Get just the IP
                     }
 
                     // Save log entry
                     Log log = new Log();
                     log.setLogTypeId(hdfsNamesystemLogType.getId());
                     log.setTimestamp(timestamp);
-                    // Additional log fields can be set here if needed
+                    log.setSourceIp(ip); // IP is captured from the details
+                    log.setDestinationIp(null); // No destination IP in these logs
                     log = logRepository.save(log);
 
                     // Save log details
-                    saveLogDetail(log.getId(), "event_type", eventType);
-                    if (path != null) {
-                        saveLogDetail(log.getId(), "path", path);
+                    saveLogDetail(log.getId(), "thread_id", threadId);
+                    saveLogDetail(log.getId(), "log_level", logLevel);
+                    saveLogDetail(log.getId(), "component", component);
+                    saveLogDetail(log.getId(), "operation", operation);
+                    saveLogDetail(log.getId(), "details", details); // Saves the full details string
+
+                    // Now, let's extract and save the block ID and size if present
+                    Pattern blockPattern = Pattern.compile("blk_(-?\\d+)");
+                    Matcher blockMatcher = blockPattern.matcher(details);
+                    if (blockMatcher.find()) {
+                        saveLogDetail(log.getId(), "block_id", blockMatcher.group(1));
                     }
-                    if (blockId != null) {
-                        saveLogDetail(log.getId(), "block_id", blockId);
+
+                    Pattern sizePattern = Pattern.compile("size (\\d+)");
+                    Matcher sizeMatcher = sizePattern.matcher(details);
+                    if (sizeMatcher.find()) {
+                        saveLogDetail(log.getId(), "size", sizeMatcher.group(1));
                     }
-                    // Add additional details as needed
                 }
             }
         } catch (DateTimeParseException e) {
@@ -173,6 +185,7 @@ public class LogParsingService {
             e.printStackTrace();
         }
     }
+
 
     private void loadHDFSDataXceiverLogs() {
         final String hdfsDataXceiverLogPath = "HDFS_DataXceiver.log.short"; // Adjust the path accordingly

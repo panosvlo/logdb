@@ -32,11 +32,11 @@ public class LogController {
     }
     @GetMapping("/total-per-day")
     public ResponseEntity<List<LogCountPerDayDTO>> getTotalLogsPerDayForActionType(
-            @RequestParam String action,
+            @RequestParam String method,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
 
-        List<Object[]> queryResults = logRepository.findTotalLogsPerDayForActionType(action, startDate, endDate);
+        List<Object[]> queryResults = logRepository.findTotalLogsPerDayForActionType(method, startDate, endDate);
         List<LogCountPerDayDTO> results = new ArrayList<>();
 
         for (Object[] result : queryResults) {
