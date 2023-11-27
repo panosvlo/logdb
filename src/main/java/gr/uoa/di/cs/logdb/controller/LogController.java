@@ -176,4 +176,9 @@ public class LogController {
         }
         return ResponseEntity.ok(blocks);
     }
+    @GetMapping("/blockAllocationsAndReplicationsSameHour")
+    public ResponseEntity<List<Object[]>> getBlockAllocationsAndReplicationsSameHour() {
+        List<Object[]> data = logRepository.findBlockAllocationsAndReplicationsSameHour();
+        return ResponseEntity.ok(data);
+    }
 }

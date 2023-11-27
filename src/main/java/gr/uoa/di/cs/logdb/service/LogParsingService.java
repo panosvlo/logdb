@@ -48,9 +48,9 @@ public class LogParsingService {
 
     @PostConstruct
     public void init() {
-        loadAccessLogs();
+//        loadAccessLogs();
         loadHDFSNamesystemLogs();
-        loadHDFSDataXceiverLogs();
+//        loadHDFSDataXceiverLogs();
     }
 
     private void loadAccessLogs() {
