@@ -154,16 +154,18 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             "FROM logs l INNER JOIN log_details ld ON l.id = ld.log_id " +
             "GROUP BY l.id, l.timestamp), " +
             "allocated AS ( " +
-            "SELECT log_id, timestamp AS allocated_time, block_id " +
-            "FROM log_operations WHERE operation = 'NameSystem.allocateBlock'), " +
+            "SELECT block_id, MIN(timestamp) AS allocated_time " +
+            "FROM log_operations WHERE operation = 'NameSystem.allocateBlock' " +
+            "GROUP BY block_id), " +
             "replicated AS ( " +
-            "SELECT log_id, timestamp AS replicated_time, block_id " +
-            "FROM log_operations WHERE operation = 'NameSystem.addStoredBlock') " +
+            "SELECT block_id, MIN(timestamp) AS replicated_time " +
+            "FROM log_operations WHERE operation = 'NameSystem.addStoredBlock' " +
+            "GROUP BY block_id) " +
             "SELECT a.block_id, a.allocated_time, r.replicated_time " +
-            "FROM allocated a INNER JOIN replicated r " +
-            "ON a.block_id = r.block_id " +
+            "FROM allocated a INNER JOIN replicated r ON a.block_id = r.block_id " +
             "AND EXTRACT(DAY FROM a.allocated_time) = EXTRACT(DAY FROM r.replicated_time) " +
             "AND EXTRACT(HOUR FROM a.allocated_time) = EXTRACT(HOUR FROM r.replicated_time) " +
             "ORDER BY a.block_id, a.allocated_time, r.replicated_time", nativeQuery = true)
     List<Object[]> findBlockAllocationsAndReplicationsSameHour();
+
 }
