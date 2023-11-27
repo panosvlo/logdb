@@ -150,4 +150,15 @@ public class LogController {
 
         return ResponseEntity.ok(results);
     }
+    @GetMapping("/referrers/multiple-resources")
+    public ResponseEntity<List<ReferrerResourceCountDTO>> getReferrersWithMultipleResources() {
+        List<Object[]> rawResults = logRepository.findReferrersWithMultipleResourcesRaw();
+        List<ReferrerResourceCountDTO> results = rawResults.stream()
+                .map(result -> new ReferrerResourceCountDTO(
+                        (String) result[0],
+                        ((Number) result[1]).intValue())
+                )
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(results);
+    }
 }

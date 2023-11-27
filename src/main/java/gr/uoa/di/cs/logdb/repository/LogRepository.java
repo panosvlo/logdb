@@ -119,4 +119,13 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             @Param("startDate") Date startDate,
             @Param("endDate") Date endDate,
             @Param("minMethods") int minMethods);
+    @Query(value = "SELECT ld_ref.value, COUNT(DISTINCT ld_res.value) " +
+            "FROM logs l JOIN log_details ld_ref ON l.id = ld_ref.log_id AND ld_ref.key = 'referer' " +
+            "JOIN log_details ld_res ON l.id = ld_res.log_id AND ld_res.key = 'resource' " +
+            "JOIN log_types lt ON l.log_type_id = lt.id " +
+            "WHERE lt.type_name = 'access_log' " +
+            "GROUP BY ld_ref.value " +
+            "HAVING COUNT(DISTINCT ld_res.value) > 1 " +
+            "ORDER BY COUNT(DISTINCT ld_res.value) DESC", nativeQuery = true)
+    List<Object[]> findReferrersWithMultipleResourcesRaw();
 }
