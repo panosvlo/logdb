@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -160,5 +161,19 @@ public class LogController {
                 )
                 .collect(Collectors.toList());
         return ResponseEntity.ok(results);
+    }
+    @GetMapping("/blocks")
+    public ResponseEntity<List<BlockAllocationDTO>> getBlockAllocationsAndReplications() {
+        List<Object[]> queryResults = logRepository.findBlockAllocationsAndReplications();
+        List<BlockAllocationDTO> blocks = queryResults.stream().map(result -> new BlockAllocationDTO(
+                (String) result[0],
+                ((Timestamp) result[1]).toLocalDateTime(),
+                ((Timestamp) result[2]).toLocalDateTime()
+        )).collect(Collectors.toList());
+
+        if (blocks.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(blocks);
     }
 }

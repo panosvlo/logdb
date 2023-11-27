@@ -128,4 +128,21 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             "HAVING COUNT(DISTINCT ld_res.value) > 1 " +
             "ORDER BY COUNT(DISTINCT ld_res.value) DESC", nativeQuery = true)
     List<Object[]> findReferrersWithMultipleResourcesRaw();
+
+    @Query(value = "WITH log_operations AS ( " +
+            "SELECT l.id AS log_id, l.timestamp, " +
+            "MAX(CASE WHEN ld.key = 'block_id' THEN ld.value END) AS block_id, " +
+            "MAX(CASE WHEN ld.key = 'operation' THEN ld.value END) AS operation " +
+            "FROM logs l INNER JOIN log_details ld ON l.id = ld.log_id " +
+            "GROUP BY l.id, l.timestamp), " +
+            "allocated AS ( " +
+            "SELECT log_id, timestamp AS allocated_time, block_id " +
+            "FROM log_operations WHERE operation = 'NameSystem.allocateBlock'), " +
+            "replicated AS ( " +
+            "SELECT log_id, timestamp AS replicated_time, block_id " +
+            "FROM log_operations WHERE operation = 'NameSystem.addStoredBlock') " +
+            "SELECT DISTINCT ON (a.block_id) a.block_id, a.allocated_time, r.replicated_time " +
+            "FROM allocated a INNER JOIN replicated r ON a.block_id = r.block_id AND DATE(a.allocated_time) = DATE(r.replicated_time) " +
+            "ORDER BY a.block_id, a.allocated_time, r.replicated_time", nativeQuery = true)
+    List<Object[]> findBlockAllocationsAndReplications();
 }
