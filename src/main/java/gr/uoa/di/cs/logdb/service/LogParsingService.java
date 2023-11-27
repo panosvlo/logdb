@@ -48,9 +48,9 @@ public class LogParsingService {
 
     @PostConstruct
     public void init() {
-//        loadAccessLogs();
-//        loadHDFSNamesystemLogs();
-//        loadHDFSDataXceiverLogs();
+        loadAccessLogs();
+        loadHDFSNamesystemLogs();
+        loadHDFSDataXceiverLogs();
     }
 
     private void loadAccessLogs() {
@@ -125,6 +125,10 @@ public class LogParsingService {
         final Pattern hdfsNamesystemLogPattern = Pattern.compile(
                 "(\\d{6} \\d{6}) (\\d+) (\\S+) (dfs\\.FSNamesystem): (BLOCK\\*) (\\S+): (.+)"
         );
+        // Pattern specifically for replication log entries
+        final Pattern hdfsReplicationLogPattern = Pattern.compile(
+                "(\\d{6} \\d{6}) (\\d+) (\\S+) (dfs\\.FSNamesystem): (BLOCK\\*) ask (\\d+.\\d+.\\d+.\\d+:\\d+) to replicate blk_(-?\\d+) to datanode\\(s\\) (.+)"
+        );
         final DateTimeFormatter hdfsDateFormatter = DateTimeFormatter.ofPattern("yyMMdd HHmmss");
         LogType hdfsNamesystemLogType = logTypeRepository.findByTypeName("hdfs_fs_namesystem_log");
 
@@ -132,6 +136,7 @@ public class LogParsingService {
             String line;
             while ((line = br.readLine()) != null) {
                 Matcher matcher = hdfsNamesystemLogPattern.matcher(line);
+                Matcher replicationMatcher = hdfsReplicationLogPattern.matcher(line);
                 if (matcher.find()) {
                     LocalDateTime dateTime = LocalDateTime.parse(matcher.group(1), hdfsDateFormatter);
                     Date timestamp = Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
@@ -176,6 +181,9 @@ public class LogParsingService {
                     if (sizeMatcher.find()) {
                         saveLogDetail(log.getId(), "size", sizeMatcher.group(1));
                     }
+                } else if (replicationMatcher.find()) {
+                    // Handle replication log entries
+                    handleReplicationLog(replicationMatcher, hdfsNamesystemLogType, hdfsDateFormatter);
                 }
             }
         } catch (DateTimeParseException e) {
@@ -184,6 +192,31 @@ public class LogParsingService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+
+    private void handleReplicationLog(Matcher matcher, LogType logType, DateTimeFormatter dateFormatter) {
+        LocalDateTime dateTime = LocalDateTime.parse(matcher.group(1), dateFormatter);
+        Date timestamp = Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+        String threadId = matcher.group(2);
+        String logLevel = matcher.group(3);
+        String sourceIp = matcher.group(6).split(":")[0]; // Extract IP from source
+        String blockId = matcher.group(7);
+        String datanodes = matcher.group(8); // This will capture all datanode IPs
+
+        Log log = new Log();
+        log.setLogTypeId(logType.getId());
+        log.setTimestamp(timestamp);
+        log.setSourceIp(sourceIp); // IP extracted from the replication log
+        log.setDestinationIp(null);
+        log = logRepository.save(log);
+
+        saveLogDetail(log.getId(), "thread_id", threadId);
+        saveLogDetail(log.getId(), "log_level", logLevel);
+        saveLogDetail(log.getId(), "operation", "replicate");
+        saveLogDetail(log.getId(), "block_id", blockId);
+        saveLogDetail(log.getId(), "datanodes", datanodes); // Saves all datanode IPs as a single entry
     }
 
 
