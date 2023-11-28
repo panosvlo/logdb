@@ -20,5 +20,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // Method for login will be implemented later
+    public User authenticateUser(String username, String password) {
+        User user = userRepository.findByUsername(username);
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            return user;
+        }
+        return null;
+    }
 }
