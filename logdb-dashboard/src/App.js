@@ -1,19 +1,29 @@
 import React, { useState } from 'react';
 import './App.css';
 import axios from 'axios';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import MainContent from './MainContent';
 import ApiForm from './ApiForm';
 import apis from './apiConfig'; // Import your API configuration
+import Login from './Login';
+import Register from './Register';
 
 function App() {
   const [selectedApi, setSelectedApi] = useState(null);
   const [params, setParams] = useState({});
   const [data, setData] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token')); // If you're storing the token in localStorage
 
   const handleParamChange = (e) => {
     const { name, value } = e.target;
     setParams(prevParams => ({ ...prevParams, [name]: value }));
+  };
+
+  const isAuthenticated = () => {
+    // Check if the token is valid (exists, not expired, etc.)
+    // This is a simplified example; in a real app, you'd also need to check if the token is expired
+    return token;
   };
 
   const handleSubmit = async (e) => {
@@ -47,6 +57,18 @@ function App() {
       return acc;
     }, {}));
   };
+
+  if (!isAuthenticated()) {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login setToken={setToken} />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<Navigate replace to="/login" />} />
+        </Routes>
+      </Router>
+    );
+  }
 
   return (
     <div className="app-container">
