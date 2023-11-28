@@ -168,5 +168,14 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             "AND EXTRACT(HOUR FROM a.allocated_time) = EXTRACT(HOUR FROM r.replicated_time) " +
             "ORDER BY a.block_id, a.allocated_time, r.replicated_time", nativeQuery = true)
     List<Object[]> findBlockAllocationsAndReplicationsSameHour();
+    @Query(value = "SELECT l.id, lt.type_name AS logType, l.timestamp, l.source_ip AS sourceIp, " +
+            "STRING_AGG(ld.key || ': ' || ld.value, '; ') AS logDetails " +
+            "FROM logs l " +
+            "JOIN log_types lt ON l.log_type_id = lt.id " +
+            "LEFT JOIN log_details ld ON l.id = ld.log_id " +
+            "WHERE l.source_ip = :ip OR l.destination_ip = :ip " +
+            "GROUP BY l.id, lt.type_name, l.timestamp, l.source_ip " +
+            "ORDER BY l.timestamp", nativeQuery = true)
+    List<Object[]> findLogsByIpNative(@Param("ip") String ip);
 
 }

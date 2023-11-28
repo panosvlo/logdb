@@ -195,4 +195,16 @@ public class LogController {
         ).collect(Collectors.toList());
         return ResponseEntity.ok(data);
     }
+    @GetMapping("/searchByIp")
+    public ResponseEntity<List<LogSearchDTO>> searchLogsByIp(@RequestParam String ip) {
+        List<Object[]> rawLogs = logRepository.findLogsByIpNative(ip);
+        List<LogSearchDTO> logs = rawLogs.stream().map(obj -> new LogSearchDTO(
+                ((Number) obj[0]).longValue(),
+                (String) obj[1],
+                (Date) obj[2],
+                (String) obj[3],
+                (String) obj[4]
+        )).collect(Collectors.toList());
+        return ResponseEntity.ok(logs);
+    }
 }
