@@ -12,7 +12,8 @@ function Login({ setToken }) {
     event.preventDefault();
     try {
       const response = await axios.post('http://localhost:8080/api/users/login', { username, password });
-      setToken(response.data.jwt);
+      localStorage.setItem('token', response.data.jwt); // Save the token to localStorage
+      setToken(response.data.jwt); // Update the state
       navigate('/'); // Redirect to the main page after successful login
     } catch (error) {
       console.error('Login failed:', error);

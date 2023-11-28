@@ -58,6 +58,15 @@ function App() {
     }, {}));
   };
 
+  const updateToken = (newToken) => {
+    if (newToken) {
+      localStorage.setItem('token', newToken); // Save the new token to localStorage
+    } else {
+      localStorage.removeItem('token'); // Clear the token from localStorage on logout
+    }
+    setToken(newToken); // Update the state
+  };
+
   if (!isAuthenticated()) {
     return (
       <Router>
