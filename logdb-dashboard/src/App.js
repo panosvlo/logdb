@@ -8,6 +8,7 @@ import ApiForm from './ApiForm';
 import apis from './apiConfig'; // Import your API configuration
 import Login from './Login';
 import Register from './Register';
+import UploadLog from './UploadLog';
 
 function App() {
   const [selectedApi, setSelectedApi] = useState(null);
@@ -84,32 +85,31 @@ function App() {
   }
 
   return (
-    <Router>
-      {isAuthenticated() ? (
+      <Router>
         <div className="app-container">
           <Sidebar apis={apis} selectedApi={selectedApi} onSelectApi={handleSelectApi} />
-          <div className="content-container">
-            {selectedApi && (
-              <ApiForm
-                api={selectedApi}
-                params={params}
-                onParamChange={handleParamChange}
-                onSubmit={handleSubmit}
-              />
-            )}
-            <MainContent data={data} />
-          </div>
-          <button onClick={logout} className="logout-button">Logout</button> {/* Add this line */}
+          <Routes> {/* Wrap your routes in a Routes component */}
+            <Route path="/" element={
+              <div className="content-container">
+                {selectedApi && (
+                  <ApiForm
+                    api={selectedApi}
+                    params={params}
+                    onParamChange={handleParamChange}
+                    onSubmit={handleSubmit}
+                  />
+                )}
+                <MainContent data={data} />
+              </div>
+            } />
+            <Route path="/upload" element={<UploadLog />} /> {/* Add this line */}
+            <Route path="/login" element={<Login setToken={setToken} />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="*" element={<Navigate replace to="/login" />} />
+          </Routes>
         </div>
-      ) : (
-        <Routes>
-          <Route path="/login" element={<Login setToken={setToken} />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<Navigate replace to="/login" />} />
-        </Routes>
-      )}
-    </Router>
-  );
-}
+      </Router>
+    );
+  }
 
 export default App;

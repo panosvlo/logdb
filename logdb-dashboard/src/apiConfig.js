@@ -114,6 +114,32 @@ const apis = [
           { name: 'minMethods', type: 'number', placeholder: 'Minimum Methods', value: 4 }
         ]
       },
+      {
+          name: 'Upload Log File',
+          endpoint: '/api/logs/upload',
+          params: [
+            {
+              name: 'logTypeId',
+              type: 'select',
+              options: [
+                { label: 'Select Log Type', value: '' },
+                { label: 'access_log', value: '1' },
+                { label: 'HDFS_FS_Namesystem', value: '3' },
+                { label: 'HDFS_DataXceiver', value: '2' }
+              ],
+              placeholder: 'Log Type',
+              value: ''
+            },
+            {
+              name: 'file',
+              type: 'file',
+              placeholder: 'Select file',
+              value: null
+            }
+          ],
+          method: 'POST',
+          description: 'Upload a log file for a specified log type.'
+        },
 ];
 
 export default apis;
