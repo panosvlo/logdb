@@ -21,7 +21,7 @@ function App() {
 
     // Prepare parameters for API 10
     let apiParams = { ...params };
-    if (selectedApi.name === 'API 10') {
+    if (selectedApi.name === 'SQL Query 11') {
       apiParams = {
         ...apiParams,
         startDate: `${apiParams.startDate} 00:00:00`,
