@@ -94,9 +94,8 @@ public class LogController {
             Long logTypeId = ((Number) obj[1]).longValue(); // Cast to Number and then get long value
             Date timestamp = (Date) obj[2];
             String sourceIp = (String) obj[3];
-            String destinationIp = (String) obj[4];
-            String logDetails = (String) obj[5];
-            return new AccessLogDTO(id, logTypeId, timestamp, sourceIp, destinationIp, logDetails);
+            String logDetails = (String) obj[4];
+            return new AccessLogDTO(id, logTypeId, timestamp, sourceIp, logDetails); // Set destinationIp as null
         }).collect(Collectors.toList());
 
         return ResponseEntity.ok(logs);

@@ -7,15 +7,13 @@ public class AccessLogDTO {
     private Long logTypeId;
     private Date timestamp;
     private String sourceIp;
-    private String destinationIp;
     private String logDetails;
 
-    public AccessLogDTO(Long id, Long logTypeId, Date timestamp, String sourceIp, String destinationIp, String logDetails) {
+    public AccessLogDTO(Long id, Long logTypeId, Date timestamp, String sourceIp, String logDetails) {
         this.id = id;
         this.logTypeId = logTypeId;
         this.timestamp = timestamp;
         this.sourceIp = sourceIp;
-        this.destinationIp = destinationIp;
         this.logDetails = logDetails;
     }
 
@@ -34,10 +32,6 @@ public class AccessLogDTO {
 
     public String getSourceIp() {
         return sourceIp;
-    }
-
-    public String getDestinationIp() {
-        return destinationIp;
     }
 
     public String getLogDetails() {
@@ -59,10 +53,6 @@ public class AccessLogDTO {
 
     public void setSourceIp(String sourceIp) {
         this.sourceIp = sourceIp;
-    }
-
-    public void setDestinationIp(String destinationIp) {
-        this.destinationIp = destinationIp;
     }
 
     public void setLogDetails(String logDetails) {
