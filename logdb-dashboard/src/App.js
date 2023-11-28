@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import axios from 'axios';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, Link, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import MainContent from './MainContent';
 import ApiForm from './ApiForm';
@@ -72,6 +72,26 @@ function App() {
     setToken(null); // Clear the token state
   };
 
+
+  const ContentWithSidebar = () => {
+    const location = useLocation();
+
+    return (
+      <>
+        {location.pathname !== '/upload' && <Sidebar apis={apis} selectedApi={selectedApi} onSelectApi={handleSelectApi} />}
+        <div className="content-container">
+          <Routes>
+            <Route path="/" element={selectedApi && <ApiForm api={selectedApi} params={params} onParamChange={handleParamChange} onSubmit={handleSubmit} />} />
+            <Route path="/upload" element={<UploadLog setData={setData} />} />
+            {/* Add more protected routes as needed */}
+            <Route path="*" element={<Navigate replace to="/" />} />
+          </Routes>
+          {location.pathname !== '/upload' && <MainContent data={data} />}
+        </div>
+      </>
+    );
+  };
+
   if (!isAuthenticated()) {
     return (
       <Router>
@@ -84,32 +104,32 @@ function App() {
     );
   }
 
+  const TopBar = () => (
+    <nav className="top-bar">
+      <Link to="/" className="nav-link">Home</Link>
+      <Link to="/upload" className="nav-link">Upload</Link>
+      <button onClick={logout} className="logout-button">Logout</button>
+    </nav>
+  );
+
   return (
       <Router>
-        <div className="app-container">
-          <Sidebar apis={apis} selectedApi={selectedApi} onSelectApi={handleSelectApi} />
-          <Routes> {/* Wrap your routes in a Routes component */}
-            <Route path="/" element={
-              <div className="content-container">
-                {selectedApi && (
-                  <ApiForm
-                    api={selectedApi}
-                    params={params}
-                    onParamChange={handleParamChange}
-                    onSubmit={handleSubmit}
-                  />
-                )}
-                <MainContent data={data} />
-              </div>
-            } />
-            <Route path="/upload" element={<UploadLog />} /> {/* Add this line */}
+        {isAuthenticated() ? (
+          <>
+            <TopBar />
+            <div className="app-container">
+              <ContentWithSidebar />
+            </div>
+          </>
+        ) : (
+          <Routes>
             <Route path="/login" element={<Login setToken={setToken} />} />
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate replace to="/login" />} />
           </Routes>
-        </div>
+        )}
       </Router>
     );
   }
 
-export default App;
+  export default App;

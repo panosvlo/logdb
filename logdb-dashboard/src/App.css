@@ -141,9 +141,6 @@
 /* ... existing styles */
 
 .logout-button {
-  position: fixed; /* Fixed position */
-  top: 10px; /* 10px from the top */
-  right: 10px; /* 10px from the right */
   padding: 10px 20px; /* Padding for size */
   background-color: #dc3545; /* Red background color */
   color: white; /* White text */
@@ -154,4 +151,28 @@
 
 .logout-button:hover {
   background-color: #bd2130; /* Slightly darker on hover */
+}
+
+
+.top-bar {
+  background-color: #333; /* Dark background for the top bar */
+  color: white;
+  padding: 10px 20px; /* Padding on all sides */
+  display: flex; /* Use flexbox for alignment */
+  justify-content: space-between; /* Space between the items */
+  align-items: center; /* Center items vertically */
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none; /* Remove underline from links */
+  margin-right: 20px; /* Spacing between links */
+}
+
+.nav-link:last-child {
+  margin-right: 0; /* No margin for the last item to use the space for logout button */
+}
+
+.nav-link:hover {
+  text-decoration: underline; /* Underline on hover for visual feedback */
 }

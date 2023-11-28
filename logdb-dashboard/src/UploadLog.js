@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function UploadLog() {
+function UploadLog({ setData }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [logTypeId, setLogTypeId] = useState('');
   const [uploadMessage, setUploadMessage] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Reset the data when the UploadLog component is mounted
+    setData(null);
+  }, [setData]);
 
   const handleFileSelect = (event) => {
     setSelectedFile(event.target.files[0]);
