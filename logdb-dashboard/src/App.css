@@ -36,3 +36,58 @@
     transform: rotate(360deg);
   }
 }
+
+/* App container styles to use flexbox */
+.app-container {
+  display: flex;
+  min-height: 100vh; /* Full height of the viewport */
+}
+
+/* Sidebar styles */
+.sidebar {
+  flex: 0 0 200px;
+  background-color: #f5f5f5;
+  padding: 1rem;
+  height: 100vh;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+
+.sidebar button {
+  display: block; /* Make buttons stack vertically */
+  width: 100%; /* Full width of the sidebar */
+  padding: 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd; /* Add separator between buttons */
+}
+
+.sidebar button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: #333; /* Make the text darker for better visibility */
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.2s;
+}
+
+.sidebar button:hover,
+.sidebar button.active { /* Style for the active API button */
+  background-color: #eaeaea;
+  color: #0056b3; /* Change text color on hover and for active button */
+  font-weight: bold; /* Make the text bold for the active button */
+}
+
+/* Content container styles */
+.content-container {
+  flex-grow: 1;
+  padding: 1rem;
+}
+/* Continue with your existing styles below... */
+

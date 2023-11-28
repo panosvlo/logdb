@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './App.css';
 import axios from 'axios';
 import Sidebar from './Sidebar';
 import MainContent from './MainContent';
@@ -47,19 +48,21 @@ function App() {
   };
 
   return (
-      <div className="app">
-        <Sidebar apis={apis} onSelectApi={handleSelectApi} />
+    <div className="app-container">
+      <Sidebar apis={apis} selectedApi={selectedApi} onSelectApi={handleSelectApi} />
+      <div className="content-container">
         {selectedApi && (
           <ApiForm
             api={selectedApi}
-            params={params} // Pass the params state as a prop to ApiForm
+            params={params}
             onParamChange={handleParamChange}
             onSubmit={handleSubmit}
           />
         )}
         <MainContent data={data} />
       </div>
-    );
-  }
+    </div>
+  );
+}
 
 export default App;
