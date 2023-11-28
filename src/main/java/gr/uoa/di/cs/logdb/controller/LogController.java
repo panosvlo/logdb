@@ -186,8 +186,13 @@ public class LogController {
         return ResponseEntity.ok(blocks);
     }
     @GetMapping("/blockAllocationsAndReplicationsSameHour")
-    public ResponseEntity<List<Object[]>> getBlockAllocationsAndReplicationsSameHour() {
-        List<Object[]> data = logRepository.findBlockAllocationsAndReplicationsSameHour();
+    public ResponseEntity<List<BlockAllocationReplicationDTO>> getBlockAllocationsAndReplicationsSameHour() {
+        List<Object[]> rawData = logRepository.findBlockAllocationsAndReplicationsSameHour();
+        List<BlockAllocationReplicationDTO> data = rawData.stream().map(obj -> new BlockAllocationReplicationDTO(
+                (String) obj[0],
+                (Date) obj[1],
+                (Date) obj[2])
+        ).collect(Collectors.toList());
         return ResponseEntity.ok(data);
     }
 }
