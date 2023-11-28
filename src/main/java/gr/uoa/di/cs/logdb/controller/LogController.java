@@ -101,8 +101,18 @@ public class LogController {
         return ResponseEntity.ok(logs);
     }
     @GetMapping("/accessLogs/firefox")
-    public ResponseEntity<List<Object[]>> getAccessLogsWithFirefox() {
-        List<Object[]> logs = logRepository.findAccessLogsByFirefoxRaw();
+    public ResponseEntity<List<AccessLogDTO>> getAccessLogsWithFirefox() {
+        List<Object[]> rawLogs = logRepository.findAccessLogsByFirefoxRaw();
+        List<AccessLogDTO> logs = rawLogs.stream().map(obj -> {
+            Long id = ((Number) obj[0]).longValue();
+            Long logTypeId = ((Number) obj[1]).longValue();
+            Date timestamp = (Date) obj[2];
+            String sourceIp = (String) obj[3];
+            // Note: Assuming the log details (user agent info, etc.) is at the 5th position (index 4)
+            String logDetails = (String) obj[5];
+            return new AccessLogDTO(id, logTypeId, timestamp, sourceIp, logDetails);
+        }).collect(Collectors.toList());
+
         return ResponseEntity.ok(logs);
     }
 
