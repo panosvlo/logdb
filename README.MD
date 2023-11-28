@@ -17,6 +17,32 @@ Here are the tools you'll need to install before you get started:
 
 ## Getting Started
 
+### Initial configuration before the startup
+
+In the file [application.properties](src/main/resources/application.properties) you can set the log 
+files that are going to be used for the initial population of the database. The files should be in the same
+level as the root of the repository. 
+```bash
+# File paths
+log.parsing.accesslog.path=access_log_full.short
+log.parsing.hdfs.namesystem.path=HDFS_FS_Namesystem.log.short
+log.parsing.hdfs.dataxceiver.path=HDFS_DataXceiver.log.short
+```
+You can also skip the initialization of the database by setting the below value in the application.properties
+file to false.
+```bash
+# Initialize database
+log.parsing.init.database=false
+```
+
+In the application.properties file you can also configure to connect
+to another database:
+```bash
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+```
+### Starting the environment
 To start the environment, run the following command:
 
 `tilt up`

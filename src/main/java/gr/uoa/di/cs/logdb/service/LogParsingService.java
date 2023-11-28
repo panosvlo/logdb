@@ -9,7 +9,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.springframework.beans.factory.annotation.Value;
 import gr.uoa.di.cs.logdb.model.Log;
 import gr.uoa.di.cs.logdb.model.LogDetail;
 import gr.uoa.di.cs.logdb.model.LogType;
@@ -44,17 +44,27 @@ public class LogParsingService {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
 
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
+    @Value("${log.parsing.accesslog.path}")
+    private String accessLogPath;
 
+    @Value("${log.parsing.hdfs.namesystem.path}")
+    private String hdfsNamesystemLogPath;
 
+    @Value("${log.parsing.hdfs.dataxceiver.path}")
+    private String hdfsDataXceiverLogPath;
+
+    @Value("${log.parsing.init.database}")
+    private boolean initDatabase;
     @PostConstruct
     public void init() {
-//        loadAccessLogs();
-//        loadHDFSNamesystemLogs();
-//        loadHDFSDataXceiverLogs();
+        if (initDatabase) {
+            loadAccessLogs();
+            loadHDFSNamesystemLogs();
+            loadHDFSDataXceiverLogs();
+        }
     }
 
     private void loadAccessLogs() {
-        final String accessLogPath = "access_log_full.short";
         final Pattern accessLogPattern = Pattern.compile("^(\\S+) \\S+ \\S+ \\[(.+?)\\] \"(\\S+) (\\S+)? (\\S+)\" (\\d{3}) (\\d+|-) \"(.*?)\" \"(.*?)\"");
         LogType accessLogType = logTypeRepository.findByTypeName("access_log");
         try (BufferedReader br = new BufferedReader(new FileReader(accessLogPath))) {
@@ -120,7 +130,6 @@ public class LogParsingService {
     }
 
     private void loadHDFSNamesystemLogs() {
-        final String hdfsNamesystemLogPath = "HDFS_FS_Namesystem.log.short";
         // Adjust the pattern to capture IP addresses and other details
         final Pattern hdfsNamesystemLogPattern = Pattern.compile(
                 "(\\d{6} \\d{6}) (\\d+) (\\S+) (dfs\\.FSNamesystem): (BLOCK\\*) (\\S+): (.+)"
@@ -221,7 +230,6 @@ public class LogParsingService {
 
 
     private void loadHDFSDataXceiverLogs() {
-        final String hdfsDataXceiverLogPath = "HDFS_DataXceiver.log.short"; // Adjust the path accordingly
         final Pattern hdfsDataXceiverLogPattern = Pattern.compile(
                 "(\\d{6} \\d{6}) (\\d+) INFO dfs\\.DataNode\\$DataXceiver: (\\S+) block blk_(-?\\d+) src: (/\\d+.\\d+.\\d+.\\d+:\\d+) dest: (/\\d+.\\d+.\\d+.\\d+:\\d+)"
         );
