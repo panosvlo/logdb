@@ -20,11 +20,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                // First configure CORS
+                .cors().and()
+                // Then disable CSRF
                 .csrf().disable()
+                // Configure authorization requests
                 .authorizeRequests()
-                .antMatchers("/api/users/register","/swagger-ui/**","/v3/api-docs/**","/api/**").permitAll() // Allow registration without authentication
+                .antMatchers("/api/users/register","/swagger-ui/**","/v3/api-docs/**","/api/**").permitAll() // Allow these endpoints without authentication
                 .anyRequest().authenticated() // All other requests need authentication
                 .and()
-                .httpBasic(); // Use HTTP Basic Authentication
+                // Finally configure HTTP Basic authentication
+                .httpBasic();
     }
 }

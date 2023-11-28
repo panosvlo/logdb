@@ -49,7 +49,7 @@ public class LogParsingService {
     @PostConstruct
     public void init() {
 //        loadAccessLogs();
-        loadHDFSNamesystemLogs();
+//        loadHDFSNamesystemLogs();
 //        loadHDFSDataXceiverLogs();
     }
 
