@@ -89,5 +89,16 @@
   flex-grow: 1;
   padding: 1rem;
 }
-/* Continue with your existing styles below... */
+
+
+
+.api-description {
+  text-align: left;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid #0056b3; /* Add a left border for emphasis */
+  background-color: #f9f9f9; /* Light background for the description */
+  color: #333;
+  font-size: 1rem;
+}
 

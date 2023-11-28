@@ -5,6 +5,7 @@ const ApiForm = ({ api, params, onParamChange, onSubmit }) => {
 
   return (
     <form onSubmit={onSubmit}>
+      <div className="api-description">{api.description}</div>
       {api.params.map((param, index) => (
         <input
           key={index}
