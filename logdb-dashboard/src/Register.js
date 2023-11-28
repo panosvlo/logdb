@@ -29,7 +29,7 @@ function Register() {
       }, 2000); // Wait 3 seconds before redirecting
     } catch (error) {
       console.error('Registration failed:', error);
-      setErrorMessage('Registration failed. Please try again.');
+      setErrorMessage('Registration failed. Please try again with a different username.');
     }
   };
 
