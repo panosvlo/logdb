@@ -66,6 +66,10 @@ function App() {
     }
     setToken(newToken); // Update the state
   };
+  const logout = () => {
+    localStorage.removeItem('token'); // Remove the token from localStorage
+    setToken(null); // Clear the token state
+  };
 
   if (!isAuthenticated()) {
     return (
@@ -80,20 +84,31 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <Sidebar apis={apis} selectedApi={selectedApi} onSelectApi={handleSelectApi} />
-      <div className="content-container">
-        {selectedApi && (
-          <ApiForm
-            api={selectedApi}
-            params={params}
-            onParamChange={handleParamChange}
-            onSubmit={handleSubmit}
-          />
-        )}
-        <MainContent data={data} />
-      </div>
-    </div>
+    <Router>
+      {isAuthenticated() ? (
+        <div className="app-container">
+          <Sidebar apis={apis} selectedApi={selectedApi} onSelectApi={handleSelectApi} />
+          <div className="content-container">
+            {selectedApi && (
+              <ApiForm
+                api={selectedApi}
+                params={params}
+                onParamChange={handleParamChange}
+                onSubmit={handleSubmit}
+              />
+            )}
+            <MainContent data={data} />
+          </div>
+          <button onClick={logout} className="logout-button">Logout</button> {/* Add this line */}
+        </div>
+      ) : (
+        <Routes>
+          <Route path="/login" element={<Login setToken={setToken} />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<Navigate replace to="/login" />} />
+        </Routes>
+      )}
+    </Router>
   );
 }
 

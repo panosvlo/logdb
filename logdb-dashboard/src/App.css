@@ -137,3 +137,21 @@
 * {
   box-sizing: border-box; /* Apply border-box sizing to all elements */
 }
+
+/* ... existing styles */
+
+.logout-button {
+  position: fixed; /* Fixed position */
+  top: 10px; /* 10px from the top */
+  right: 10px; /* 10px from the right */
+  padding: 10px 20px; /* Padding for size */
+  background-color: #dc3545; /* Red background color */
+  color: white; /* White text */
+  border: none; /* No border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.logout-button:hover {
+  background-color: #bd2130; /* Slightly darker on hover */
+}
