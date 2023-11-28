@@ -1,9 +1,12 @@
 import React from 'react';
 
 const MainContent = ({ data }) => {
+  // Handle case where data is not an array
   if (!data) return null;
 
-  const keys = data.length > 0 ? Object.keys(data[0]) : [];
+  // Check if data is an array, otherwise make it an array
+  const dataArray = Array.isArray(data) ? data : [data];
+  const keys = dataArray.length > 0 ? Object.keys(dataArray[0]) : [];
 
   return (
     <div className="main-content">
@@ -14,9 +17,11 @@ const MainContent = ({ data }) => {
           </tr>
         </thead>
         <tbody>
-          {data.map((item, index) => (
+          {dataArray.map((item, index) => (
             <tr key={index}>
-              {keys.map(key => <td key={key}>{item[key]}</td>)}
+              {keys.map(key => (
+                <td key={key}>{item[key]}</td>
+              ))}
             </tr>
           ))}
         </tbody>
