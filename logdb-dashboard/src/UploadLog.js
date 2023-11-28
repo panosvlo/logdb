@@ -6,6 +6,7 @@ function UploadLog({ setData }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [logTypeId, setLogTypeId] = useState('');
   const [uploadMessage, setUploadMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,8 @@ function UploadLog({ setData }) {
 
   const handleUpload = async (event) => {
     event.preventDefault();
+    setUploadMessage('');
+    setIsLoading(true);
     const formData = new FormData();
     formData.append('file', selectedFile);
     formData.append('logTypeId', logTypeId);
@@ -30,17 +33,18 @@ function UploadLog({ setData }) {
         },
       });
       setUploadMessage(response.data);
-      // Optionally navigate to another route after successful upload
-      // navigate('/some-route');
+      setIsLoading(false);
     } catch (error) {
       console.error('Upload failed:', error);
       setUploadMessage('Failed to upload and parse file.');
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="upload-form">
       <h2>Upload Log File</h2>
+      {isLoading && <p className="message">Uploading file, please wait...</p>}
       {uploadMessage && <p className="message">{uploadMessage}</p>}
       <form onSubmit={handleUpload}>
         <div>
