@@ -21,12 +21,12 @@ function Register() {
 
   const handleRegister = async (event) => {
     event.preventDefault();
-    setSuccessMessage(''); // Clear previous success message
-    setErrorMessage(''); // Clear previous error message
     try {
       await axios.post('http://localhost:8080/api/users/register', user);
-      setSuccessMessage('Registration successful! You can now login.');
-      navigate('/login'); // Redirect to login page after registration
+      setSuccessMessage('Registration successful! Redirecting to login...');
+      setTimeout(() => {
+        navigate('/login'); // Redirect to login page after message disappears
+      }, 2000); // Wait 3 seconds before redirecting
     } catch (error) {
       console.error('Registration failed:', error);
       setErrorMessage('Registration failed. Please try again.');

@@ -133,3 +133,7 @@
   color: #dc3545; /* error message in red */
   margin-top: 10px;
 }
+
+* {
+  box-sizing: border-box; /* Apply border-box sizing to all elements */
+}
