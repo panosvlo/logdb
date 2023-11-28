@@ -62,12 +62,12 @@ const apis = [
     },
     {
         name: 'API 10',
-        endpoint: '/api/logs/methodUsage',
-        params: [
-          { name: 'httpMethod', type: 'text', placeholder: 'HTTP Method', value: 'GET' },
-          { name: 'startDate', type: 'datetime-local', placeholder: 'Start Date', value: '' },
-          { name: 'endDate', type: 'datetime-local', placeholder: 'End Date', value: '' }
-        ]
+          endpoint: '/api/logs/methodUsage',
+          params: [
+            { name: 'httpMethod', type: 'text', placeholder: 'HTTP Method', value: 'GET' },
+            { name: 'startDate', type: 'date', placeholder: 'Start Date', value: '' },
+            { name: 'endDate', type: 'date', placeholder: 'End Date', value: '' }
+          ]
       },
       {
         name: 'API 11',
