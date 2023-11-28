@@ -2,12 +2,15 @@ package gr.uoa.di.cs.logdb.controller;
 
 import gr.uoa.di.cs.logdb.dto.*;
 import gr.uoa.di.cs.logdb.repository.LogRepository;
+import gr.uoa.di.cs.logdb.util.LogFileParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import gr.uoa.di.cs.logdb.service.LogParsingService;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -20,7 +23,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/logs")
 public class LogController {
+    @Autowired
+    private LogParsingService logParsingService;
 
+    @Autowired
+    private LogFileParser logFileParser;
     @Autowired
     private LogRepository logRepository;
 
@@ -206,5 +213,15 @@ public class LogController {
                 (String) obj[4]
         )).collect(Collectors.toList());
         return ResponseEntity.ok(logs);
+    }
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadLogFile(@RequestParam("file") MultipartFile file,
+                                           @RequestParam("logTypeId") Integer logTypeId) {
+        try {
+            logFileParser.parseAndLoadLogFile(file, logTypeId);
+            return ResponseEntity.ok("File uploaded and parsed successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to upload and parse file: " + e.getMessage());
+        }
     }
 }
