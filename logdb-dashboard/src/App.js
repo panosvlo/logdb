@@ -106,9 +106,13 @@ function App() {
 
   const TopBar = () => (
     <nav className="top-bar">
-      <Link to="/" className="nav-link">Home</Link>
-      <Link to="/upload" className="nav-link">Upload</Link>
-      <button onClick={logout} className="logout-button">Logout</button>
+      <div className="nav-links">
+        <Link to="/" className="nav-link">Home</Link>
+        <Link to="/upload" className="nav-link">Upload</Link>
+      </div>
+      <div>
+        <button onClick={logout} className="logout-button">Logout</button>
+      </div>
     </nav>
   );
 

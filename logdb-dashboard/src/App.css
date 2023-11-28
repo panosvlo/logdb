@@ -159,8 +159,9 @@
   color: white;
   padding: 10px 20px; /* Padding on all sides */
   display: flex; /* Use flexbox for alignment */
-  justify-content: space-between; /* Space between the items */
+  justify-content: flex-start; /* Align items to the start */
   align-items: center; /* Center items vertically */
+  justify-content: space-between;
 }
 
 .nav-link {
