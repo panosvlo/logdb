@@ -41,6 +41,7 @@ function App() {
 
   const handleSelectApi = (api) => {
     setSelectedApi(api);
+    setData(null);
     setParams(api.params.reduce((acc, param) => {
       acc[param.name] = param.value || '';
       return acc;
