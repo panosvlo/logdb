@@ -1,5 +1,13 @@
 const apis = [
   {
+    name: 'Search Logs by IP',
+    endpoint: '/api/logs/searchByIp',
+    params: [
+      { name: 'ip', type: 'text', placeholder: 'IP Address', value: '' }
+    ],
+    description: 'Search for all logs associated with a specific IP (source or destination).'
+  },
+  {
     name: 'SQL Query 1',
     endpoint: '/api/logs/countByType',
     description: 'Find the total logs per type that were created within a specified time range and sort them in a descending order. Please note that individual files may log actions of more than one type.',
