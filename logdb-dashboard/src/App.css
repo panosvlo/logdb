@@ -123,3 +123,13 @@
 .auth-form button {
   width: 100%;
 }
+
+.message {
+  color: #28a745; /* success message in green */
+  margin-top: 10px;
+}
+
+.error {
+  color: #dc3545; /* error message in red */
+  margin-top: 10px;
+}

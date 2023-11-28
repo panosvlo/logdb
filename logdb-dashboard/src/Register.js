@@ -10,6 +10,8 @@ function Register() {
     address: '',
     email: ''
   });
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   const handleInputChange = (event) => {
@@ -19,17 +21,23 @@ function Register() {
 
   const handleRegister = async (event) => {
     event.preventDefault();
+    setSuccessMessage(''); // Clear previous success message
+    setErrorMessage(''); // Clear previous error message
     try {
       await axios.post('http://localhost:8080/api/users/register', user);
+      setSuccessMessage('Registration successful! You can now login.');
       navigate('/login'); // Redirect to login page after registration
     } catch (error) {
       console.error('Registration failed:', error);
+      setErrorMessage('Registration failed. Please try again.');
     }
   };
 
   return (
       <div className="auth-form">
         <h2>Register</h2>
+        {successMessage && <p className="message">{successMessage}</p>}
+        {errorMessage && <p className="error">{errorMessage}</p>} {/* Use the 'error' class for error messages */}
         <form onSubmit={handleRegister}>
           <input
             type="text"
